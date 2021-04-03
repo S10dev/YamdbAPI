@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+=======
+    'rates',
+>>>>>>> Categories_Genres_Titles
     'api',
     'rest_framework',
 ]
@@ -87,6 +91,15 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
+<<<<<<< HEAD
+=======
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+]
+
+>>>>>>> Categories_Genres_Titles
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -125,4 +138,7 @@ EMAIL_USE_SSL = False
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=200),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
+    
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 10
 }

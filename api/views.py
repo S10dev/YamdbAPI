@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, status
+from rest_framework import authentication, permissions, status, viewsets
 from django.contrib.auth.models import User
-from .serializers import EmailSerializer, Confirm_RegistrationSerializer
+from .serializers import EmailSerializer, Confirm_RegistrationSerializer, TitleSerializer, GenreSerializer, CategorySerializer
 from django.core.mail import send_mail
 import random
 import string
 from .permissions import IsModerator, IsAdmin
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
+from rates.models import Title, Genre, Category
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
@@ -80,3 +82,24 @@ class Confirm_registration(APIView):
             return Response(self.get_tokens_for_user(user), status = status.HTTP_200_OK)
         else:
             return Response({'confirmation_code': f'{confirmation_code}'}, status = status.HTTP_400_BAD_REQUEST)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = []
+    pagination_class = PageNumberPagination
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = []
+    pagination_class = PageNumberPagination
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = []
+    pagination_class = PageNumberPagination
