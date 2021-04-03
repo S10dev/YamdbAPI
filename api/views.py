@@ -7,6 +7,8 @@ from .serializers import EmailSerializer, Confirm_RegistrationSerializer
 from django.core.mail import send_mail
 import random
 import string
+from .permissions import IsModerator, IsAdmin
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
@@ -26,11 +28,15 @@ class PostEmail(APIView):
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
         confirmation_code = f'{self.randomStringwithDigitsAndSymbols()}'
-        
+        email = f'{serializer.validated_data["email"]}'
+
+        if User.objects.all().filter(email=email):
+            return Response({'error': 'email already registered'})
+
         try:
             User.objects.create(
                 username = f'user{User.objects.all().count()+1}',
-                email = f'{serializer.validated_data["email"]}',
+                email = email,
                 confirmation_code = confirmation_code
                 )
         except Exception as e:
@@ -74,8 +80,3 @@ class Confirm_registration(APIView):
             return Response(self.get_tokens_for_user(user), status = status.HTTP_200_OK)
         else:
             return Response({'confirmation_code': f'{confirmation_code}'}, status = status.HTTP_400_BAD_REQUEST)
-
-
-class T(APIView):
-    def get(self, request):
-        return Response({'cool':'ass'}, status = status.HTTP_200_OK)
