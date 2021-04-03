@@ -11,7 +11,7 @@ class Confirm_RegistrationSerializer(serializers.Serializer):
 from rates.models import Title, Genre, Category
 
 
-class GenreField(serializers.RelatedField):
+class GenreField(serializers.SlugRelatedField):
     def to_representation(self, value):
         return {
             'name': value.name,
@@ -19,7 +19,7 @@ class GenreField(serializers.RelatedField):
         }
 
 
-class CategoryField(serializers.RelatedField):
+class CategoryField(serializers.SlugRelatedField):
     def to_representation(self, value):
         return {
             'name': value.name,
@@ -29,8 +29,8 @@ class CategoryField(serializers.RelatedField):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreField(read_only='True')
-    category = CategoryField(read_only='True')
+    genre = GenreField(slug_field='slug', queryset=Genre.objects.all(), required=False)
+    category = CategoryField(slug_field='slug', queryset=Category.objects.all(), required=False)
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')

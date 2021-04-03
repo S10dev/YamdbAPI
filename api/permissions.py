@@ -13,6 +13,7 @@ class IsModerator(permissions.BasePermission):
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
+        print(request.user)
         if request.user.username == '':
             return False
         try:
@@ -24,3 +25,11 @@ class IsAdmin(permissions.BasePermission):
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, object):
         return obj.username == request.user
+
+
+class IsSafe(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return False

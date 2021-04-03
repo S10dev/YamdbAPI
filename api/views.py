@@ -7,17 +7,16 @@ from .serializers import EmailSerializer, Confirm_RegistrationSerializer, TitleS
 from django.core.mail import send_mail
 import random
 import string
-from .permissions import IsModerator, IsAdmin
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from .permissions import IsModerator, IsAdmin, IsSafe
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rates.models import Title, Genre, Category
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics
 
 # Create your views here.
 
 class PostEmail(APIView):
-    authentication_classes = ()
-    permission_classes = ()
     # Generating random string for conf. code
     def randomStringwithDigitsAndSymbols(self, stringLength=10):
         password_characters = string.ascii_letters + string.digits
@@ -56,8 +55,6 @@ class PostEmail(APIView):
 
 
 class Confirm_registration(APIView):
-    authentication_classes = ()
-    permission_classes = ()
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
 
@@ -87,19 +84,19 @@ class Confirm_registration(APIView):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = []
+    permission_classes = [IsSafe|IsAdmin|IsModerator]
     pagination_class = PageNumberPagination
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = []
+    permission_classes = [IsSafe|IsAdmin|IsModerator]
     pagination_class = PageNumberPagination
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = []
+    permission_classes = [IsSafe|IsAdmin|IsModerator]
     pagination_class = PageNumberPagination
