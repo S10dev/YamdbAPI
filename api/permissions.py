@@ -5,26 +5,18 @@ class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.username == '':
             return False
-        try:
-            return request.user.groups.get_by_natural_key('moderator').is_moderator == True
-        except Exception:
-                return False
+        return request.user.get_role_display() in ('Admin', 'Moderator')
 
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        print(request.user)
         if request.user.username == '':
             return False
-        try:
-            return request.user.groups.get_by_natural_key('admin').is_admin == True
-        except Exception:
-                return False
-
+        return request.user.get_role_display() == 'Admin'
 
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, object):
-        return obj.username == request.user
+        return object == request.user
 
 
 class IsSafe(permissions.BasePermission):

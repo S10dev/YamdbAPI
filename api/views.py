@@ -3,17 +3,18 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status, viewsets
 from django.contrib.auth.models import User
-from .serializers import EmailSerializer, Confirm_RegistrationSerializer, TitleSerializer, GenreSerializer, CategorySerializer
+from .serializers import EmailSerializer, Confirm_RegistrationSerializer, TitleSerializer, GenreSerializer, CategorySerializer, UserSerializer
 from django.core.mail import send_mail
 import random
 import string
-from .permissions import IsModerator, IsAdmin, IsSafe
+from .permissions import IsModerator, IsAdmin, IsSafe, IsOwner
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rates.models import Title, Genre, Category
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import generics
-
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import permission_classes
 # Create your views here.
 
 class PostEmail(APIView):
@@ -84,19 +85,58 @@ class Confirm_registration(APIView):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = [IsSafe|IsAdmin|IsModerator]
+    permission_classes = [IsSafe|IsModerator]
     pagination_class = PageNumberPagination
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(
+    viewsets.mixins.CreateModelMixin,
+    viewsets.mixins.ListModelMixin,
+    viewsets.mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+    ):
+    lookup_field='slug'
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsSafe|IsAdmin|IsModerator]
+    permission_classes = [IsSafe|IsAdmin]
     pagination_class = PageNumberPagination
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(
+    viewsets.mixins.CreateModelMixin,
+    viewsets.mixins.ListModelMixin,
+    viewsets.mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+    ):
+    lookup_field='slug'
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsSafe|IsAdmin|IsModerator]
+    permission_classes = [IsSafe|IsAdmin]
     pagination_class = PageNumberPagination
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    lookup_field='username'
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdmin]
+    pagination_class = PageNumberPagination
+
+
+class UserMeViewSet(APIView):
+    def get(self, request):
+        if request.user.username == '':
+            return Response({'detail': 'Please login'})
+        queryset = request.user
+        serializer = UserSerializer(queryset)
+        return Response(serializer.data, status= status.HTTP_200_OK)
+
+
+    def patch(self, request):
+        if request.user.username == '':
+            return Response({'detail': 'Please login'})
+        instance = request.user
+        serializer = UserSerializer(instance=instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status= status.HTTP_202_ACCEPTED)
