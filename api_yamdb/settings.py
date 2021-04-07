@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rates',
     'api',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

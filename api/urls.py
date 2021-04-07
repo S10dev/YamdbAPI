@@ -4,10 +4,15 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('titles', views.TitleViewSet)
+router.register('titles', views.TitleViewSet, 'Title')
 router.register('genres', views.GenreViewSet)
 router.register('categories', views.CategoryViewSet)
 router.register('users', views.UserViewSet)
+router.register(r'titles/(?P<title_id>\d+)/reviews', views.ReviewViewSet)
+router.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    views.CommentViewSet
+    )
 
 urlpatterns = [
     path('users/me', views.UserMeViewSet.as_view()),
