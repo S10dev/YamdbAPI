@@ -5,14 +5,14 @@ class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.username == '':
             return False
-        return request.user.get_role_display() in ('Admin', 'Moderator')
+        return request.user.role in ('admin', 'moderator')
 
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.username == '':
             return False
-        return request.user.get_role_display() == 'Admin'
+        return request.user.role == 'admin'
 
 class IsOwner(permissions.BasePermission):
     def has_permission(self, request, view):

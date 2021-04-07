@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from rates.models import User
 from rates.models import Title, Genre, Category, Review, Comment
 
 class EmailSerializer(serializers.Serializer):
@@ -11,14 +11,6 @@ class Confirm_RegistrationSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(max_length=10)
 
 
-class GenreField(serializers.SlugRelatedField):
-    def to_representation(self, value):
-        return {
-            'name': value.name,
-            'slug': value.slug
-        }
-
-
 class CategoryField(serializers.SlugRelatedField):
     def to_representation(self, value):
         return {
@@ -27,14 +19,20 @@ class CategoryField(serializers.SlugRelatedField):
         }
 
 
-
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreField(slug_field='slug', queryset=Genre.objects.all(), required=False)
+    genre = serializers.SerializerMethodField()
     category = CategoryField(slug_field='slug', queryset=Category.objects.all(), required=False)
     rating = serializers.IntegerField()
+
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = ('id', 'year', 'name', 'rating', 'description', 'genre', 'category')
+
+    def get_genre(self, obj):
+        return {
+            'name': obj.title.all()[0].genre.name,
+            'slug': obj.title.all()[0].genre.slug
+            }
     
 
 

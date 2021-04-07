@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status, viewsets
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from .serializers import (
     EmailSerializer, Confirm_RegistrationSerializer, TitleSerializer,
     GenreSerializer, CategorySerializer, UserSerializer,
@@ -93,7 +94,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = [IsSafe|IsModerator]
     pagination_class = PageNumberPagination
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['category', 'genre', 'name', 'year']
+    filterset_fields = ['category', 'name', 'year']
 
 
     def get_queryset(self):

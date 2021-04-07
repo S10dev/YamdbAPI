@@ -123,10 +123,12 @@ REST_FRAMEWORK = {
   'DEFAULT_AUTHENTICATION_CLASSES': (
     'rest_framework_simplejwt.authentication.JWTAuthentication',
   ),
-  'PAGE_SIZE': 10
+#   'PAGE_SIZE': 10
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=200),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
 }
+
+AUTH_USER_MODEL = 'rates.User'

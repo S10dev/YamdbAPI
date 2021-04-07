@@ -1,18 +1,43 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+
+class User(AbstractUser):
+    class Roles(models.TextChoices):
+        USER = 'user', 'User'
+        MODERATOR = 'moderator', 'Moderator'
+        ADMIN = 'admin', 'Admin'
+
+
+    username = models.CharField(max_length=50, unique=True)
+    email =  models.EmailField(max_length=20)
+    role = models.CharField(max_length=9, choices=Roles.choices, default=Roles.USER)
+    bio = models.TextField(null=True, blank=True, verbose_name='О себе')
+    first_name = models.CharField(max_length=10)
+    last_name = models.CharField(max_length=10)
+    confirmation_code = models.CharField(max_length=10, null=True, blank=True)
+
+
+User = get_user_model()
+
+
 class Title(models.Model):
     name = models.CharField(max_length=20, verbose_name='Название')
     year = models.IntegerField(verbose_name='Год', null=True, blank=True)
     description = models.TextField(verbose_name='Описание', null=True, blank=True)
-    genre = models.ForeignKey('Genre', on_delete=models.PROTECT, verbose_name='Жанр', null=True, blank=True)
-    category = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name='Категория', null=True, blank=True)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, verbose_name='Категория', null=True, blank=True)
 
 
     def __str__(self):
         return self.name
+
+
+class genre_title(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE, related_name='title')
+    genre = models.ForeignKey('Genre', on_delete=models.CASCADE, related_name='genre')
 
 
 class Genre(models.Model):
