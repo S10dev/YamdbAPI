@@ -1,8 +1,8 @@
 .git/*
 env/
 venv/
-static/admin
-static/rest_framework
+static/admin/
+static/rest_framework/
 
 __pycache__/
 *.py[cod]
