@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+
+  db:
+    build:
+      context: ./Docker/postgres/
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    volumes:
+      - ./Docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+    volumes:
+      - ./:/code/
+
+  nginx:
+    build: 
+      context: ./Docker/nginx/
+      dockerfile: Dockerfile
+    ports: 
+      - '80:80'
+    depends_on:
+      - db
+      - web
+    volumes:
+      - ./static/:/static/

@@ -25,10 +25,10 @@ import django_filters.rest_framework
 # Create your views here.
 
 class PostEmail(APIView):
-    # Generating random string for conf. code
     def randomStringwithDigitsAndSymbols(self, stringLength=10):
+        '''Generating random string for the account verification'''
         password_characters = string.ascii_letters + string.digits
-        return ''.join(random.choice(password_characters) for i in range(stringLength))
+        return ''.join(random.choice(password_characters) for _ in range(stringLength))
 
 
     def post(self, request):
