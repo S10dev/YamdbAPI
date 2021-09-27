@@ -1,38 +1,35 @@
 version: '3.8'
 
+volumes:
+  postgres_data:
+  static:
+
 services:
 
   db:
-    build:
-      context: ./Docker/postgres/
-      dockerfile: Dockerfile
+    image: postgres:12.4
     env_file:
       - ./.env
     volumes:
-      - ./Docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
+    image: s10dev/yamdb:latest
     depends_on:
       - db
-    env_file:
-      - ./.env
     volumes:
-      - ./:/code/
+      - static:/app/static/
+    ports:
+      - "8000:8000"
 
   nginx:
-    build: 
-      context: ./Docker/nginx/
-      dockerfile: Dockerfile
+    image: s10dev/nginx:latest
     ports: 
       - '80:80'
     depends_on:
       - db
       - web
     volumes:
-      - ./static/:/static/
+      - static:/static/

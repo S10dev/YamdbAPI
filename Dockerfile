@@ -1,12 +1,21 @@
-FROM python:3.8.5
+FROM python:3.9-alpine
 
-WORKDIR /usr/src/app
 
-COPY requirements.txt .
-COPY entrypoint.sh .
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+WORKDIR /app
+
+RUN apk --update add
+RUN apk add gcc libc-dev libffi-dev jpeg-dev zlib-dev libjpeg
+RUN apk add postgresql-dev
+
+RUN pip install --upgrade pip
+
+COPY ./requirements.txt .
 
 RUN pip install -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]
+#ENTRYPOINT [ "/app/entrypoint.sh" ]

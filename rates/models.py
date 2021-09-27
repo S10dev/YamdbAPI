@@ -13,7 +13,7 @@ class User(AbstractUser):
 
 
     username = models.CharField(max_length=50, unique=True)
-    email =  models.EmailField(max_length=20)
+    email =  models.EmailField(max_length=25)
     role = models.CharField(max_length=9, choices=Roles.choices, default=Roles.USER)
     bio = models.TextField(null=True, blank=True, verbose_name='О себе')
     first_name = models.CharField(max_length=10)
@@ -25,7 +25,7 @@ User = get_user_model()
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=20, verbose_name='Название')
+    name = models.CharField(max_length=100, verbose_name='Название')
     year = models.IntegerField(verbose_name='Год', null=True, blank=True)
     description = models.TextField(verbose_name='Описание', null=True, blank=True)
     category = models.ForeignKey('Category', on_delete=models.SET_NULL, verbose_name='Категория', null=True, blank=True)
