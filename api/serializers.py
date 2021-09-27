@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rates.models import User
 from rates.models import Title, Genre, Category, Review, Comment
 
+
 class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -21,19 +22,22 @@ class CategoryField(serializers.SlugRelatedField):
 
 class TitleSerializer(serializers.ModelSerializer):
     genre = serializers.SerializerMethodField()
-    category = CategoryField(slug_field='slug', queryset=Category.objects.all(), required=False)
+    category = CategoryField(
+        slug_field='slug', queryset=Category.objects.all(), required=False
+        )
     rating = serializers.IntegerField()
 
     class Meta:
         model = Title
-        fields = ('id', 'year', 'name', 'rating', 'description', 'genre', 'category')
+        fields = (
+            'id', 'year', 'name', 'rating', 'description', 'genre', 'category'
+        )
 
     def get_genre(self, obj):
         return {
             'name': obj.title.all()[0].genre.name,
             'slug': obj.title.all()[0].genre.slug
             }
-    
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -51,11 +55,14 @@ class CategorySerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "username", "bio", "email", "role")
+        fields = (
+            "first_name", "last_name", "username", "bio", "email", "role"
+            )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
+
     class Meta:
         model = Review
         exclude = ('title', )
@@ -63,6 +70,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
+
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')

@@ -14,11 +14,11 @@ class IsAdmin(permissions.BasePermission):
             return False
         return request.user.role == 'admin'
 
+
 class IsOwner(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.username == '':
             return False
-
 
     def has_object_permission(self, request, view, object):
         return object == request.user

@@ -21,5 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('api.urls')),
     path('auth/', include('django.contrib.auth.urls')),
-    path('redoc/', TemplateView.as_view(template_name='redoc.html'), name='redoc'),
+    path(
+        'redoc/',
+        TemplateView.as_view(template_name='redoc.html'),
+        name='redoc'
+        ),
 ]
