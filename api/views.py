@@ -30,7 +30,8 @@ class PostEmail(APIView):
             ''.join(random.choice(rand_chars) for _ in range(stringLength))
 
     def post(self, request):
-        '''Getting an email from user. After validation sending him a confirmation_code'''
+        '''Getting an email from user.
+        After validation sending him a confirmation_code'''
         serializer = EmailSerializer(data=request.POST)
         if not serializer.is_valid():
             return Response(
@@ -66,8 +67,9 @@ class PostEmail(APIView):
 
 
 class Confirm_registration(APIView):
-    '''Getting an email and a confirmation_code form user. 
-        Then comparing it with value frin DB. If success sending JWT token to user'''
+    '''Getting an email and a confirmation_code form user.
+    Then comparing it with value frin DB.
+    If success sending JWT token to user'''
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
 
@@ -181,7 +183,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [
-        IsSafe | (IsAuthenticated & IsPostMethod) | IsAdmin | IsOwner | IsModerator
+        IsSafe | (IsAuthenticated & IsPostMethod) |
+        IsAdmin | IsOwner | IsModerator
         ]
     pagination_class = PageNumberPagination
 
@@ -203,7 +206,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [
-        IsSafe | (IsAuthenticated & IsPostMethod) | IsAdmin | IsOwner | IsModerator
+        IsSafe | (IsAuthenticated & IsPostMethod) |
+        IsAdmin | IsOwner | IsModerator
         ]
     pagination_class = PageNumberPagination
 
