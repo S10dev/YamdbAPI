@@ -16,7 +16,7 @@ import django_filters.rest_framework
 from .serializers import (
     EmailSerializer, Confirm_RegistrationSerializer, TitleSerializer,
     GenreSerializer, CategorySerializer, UserSerializer,
-    ReviewSerializer, CommentSerializer
+    ReviewSerializer, CommentSerializer, UserMeSerializer
     )
 from .permissions import IsModerator, IsAdmin, IsPostMethod, IsSafe, IsOwner
 User = get_user_model()
@@ -170,7 +170,7 @@ class UserMeViewSet(APIView):
 
     def patch(self, request):
         instance = request.user
-        serializer = UserSerializer(
+        serializer = UserMeSerializer(
             instance=instance, data=request.data, partial=True
             )
         serializer.is_valid(raise_exception=True)
