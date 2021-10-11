@@ -32,7 +32,7 @@ class IsSafe(permissions.BasePermission):
             return False
 
 
-class IsPost(permissions.BasePermission):
+class IsPostMethod(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == 'POST':
             return True

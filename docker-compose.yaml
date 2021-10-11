@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 volumes:
   postgres_data:
@@ -9,27 +9,28 @@ services:
   db:
     image: postgres:12.4
     env_file:
-      - ./.env
+      - ./api_yamdb/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
 
   web:
-    image: s10dev/yamdb:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - db
     volumes:
       - static:/app/static/
-    ports:
-      - "8000:8000"
 
   nginx:
-    image: s10dev/nginx:latest
+    image: nginx
     ports: 
       - '80:80'
     depends_on:
       - db
       - web
     volumes:
+      - ./nginx:/etc/nginx/conf.d
       - static:/static/

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import AbstractUser
-User = get_user_model()
 
 
 class User(AbstractUser):
@@ -22,6 +21,9 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=10)
     last_name = models.CharField(max_length=10)
     confirmation_code = models.CharField(max_length=10, null=True, blank=True)
+
+
+User = get_user_model()
 
 
 class Title(models.Model):

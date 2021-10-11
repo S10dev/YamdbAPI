@@ -6,7 +6,6 @@ static/rest_framework/
 
 __pycache__/
 *.py[cod]
-.env
 .idea
 .DS_Store
 .AppleDouble

@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rates.models import Title, Genre, Category, Review, Comment
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Avg
 import django_filters.rest_framework
 from .serializers import (
@@ -18,7 +18,7 @@ from .serializers import (
     GenreSerializer, CategorySerializer, UserSerializer,
     ReviewSerializer, CommentSerializer
     )
-from .permissions import IsModerator, IsAdmin, IsSafe, IsOwner, IsPost
+from .permissions import IsModerator, IsAdmin, IsPostMethod, IsSafe, IsOwner
 User = get_user_model()
 
 
@@ -30,6 +30,7 @@ class PostEmail(APIView):
             ''.join(random.choice(rand_chars) for _ in range(stringLength))
 
     def post(self, request):
+        '''Getting an email from user. After validation sending him a confirmation_code'''
         serializer = EmailSerializer(data=request.POST)
         if not serializer.is_valid():
             return Response(
@@ -42,6 +43,14 @@ class PostEmail(APIView):
         if User.objects.all().filter(email=email):
             return Response({'error': 'email already registered'})
 
+        send_mail(
+            'Validation code for JWT token',
+            confirmation_code,
+            'senddjango2@gmail.com',
+            [serializer.validated_data["email"]],
+            fail_silently=False
+            )
+
         try:
             User.objects.create(
                 username=f'user{User.objects.all().count()+1}',
@@ -53,19 +62,13 @@ class PostEmail(APIView):
                 {'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST
                 )
 
-        send_mail(
-            'Validation code for JWT token',
-            confirmation_code,
-            'senddjango2@gmail.com',
-            [serializer.validated_data["email"]],
-            fail_silently=False
-            )
-
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
 class Confirm_registration(APIView):
-    def get_tokens_for_user(self, user):
+    '''Getting an email and a confirmation_code form user. 
+        Then comparing it with value frin DB. If success sending JWT token to user'''
+    def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
 
         return {
@@ -89,7 +92,7 @@ class Confirm_registration(APIView):
 
         if user.confirmation_code == confirmation_code:
             return Response(
-                self.get_tokens_for_user(user), status=status.HTTP_200_OK
+                self.get_token_for_user(user), status=status.HTTP_200_OK
                 )
         else:
             return Response(
@@ -99,6 +102,7 @@ class Confirm_registration(APIView):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    '''Viewset for titles'''
     serializer_class = TitleSerializer
     permission_classes = [IsSafe | IsModerator]
     pagination_class = PageNumberPagination
@@ -116,6 +120,7 @@ class GenreViewSet(
     viewsets.mixins.DestroyModelMixin,
     viewsets.GenericViewSet
         ):
+    '''Viewset for genres'''
     lookup_field = 'slug'
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -131,6 +136,7 @@ class CategoryViewSet(
     viewsets.mixins.DestroyModelMixin,
     viewsets.GenericViewSet
         ):
+    '''Viewset for categories'''
     lookup_field = 'slug'
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -141,6 +147,7 @@ class CategoryViewSet(
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    '''Viewset for entire users (only admin access)'''
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -151,6 +158,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class UserMeViewSet(APIView):
+    '''Viewset for one user (only Authenticated user access)'''
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -169,10 +177,11 @@ class UserMeViewSet(APIView):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    '''Viewset for reviews'''
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [
-        IsSafe | (IsAuthenticated & IsPost) | IsAdmin | IsOwner | IsModerator
+        IsSafe | (IsAuthenticated & IsPostMethod) | IsAdmin | IsOwner | IsModerator
         ]
     pagination_class = PageNumberPagination
 
@@ -190,10 +199,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    '''Viewset for comments'''
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [
-        IsSafe | (IsAuthenticated & IsPost) | IsAdmin | IsOwner | IsModerator
+        IsSafe | (IsAuthenticated & IsPostMethod) | IsAdmin | IsOwner | IsModerator
         ]
     pagination_class = PageNumberPagination
 
@@ -205,3 +215,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         get_object_or_404(Review, id=review_id)
         queryset = self.queryset.filter(review__id=review_id)
         return queryset
+
+
+def redirect_to_index_API(request):
+    '''Redirect from localhost to localhost/api/v1/'''
+    return redirect('api/v1/')

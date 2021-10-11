@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
+from api.views import redirect_to_index_API
 
 urlpatterns = [
+    path('', redirect_to_index_API),
     path('admin/', admin.site.urls),
-    path('api/v1/', include('api.urls')),
+    path('api/v1/', include('api.urls'), name='index_API'),
     path('auth/', include('django.contrib.auth.urls')),
     path(
         'redoc/',
